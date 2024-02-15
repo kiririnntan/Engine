@@ -3,6 +3,7 @@
 
 #include "framework.h"
 #include "Engine.h"
+#include "systemclass.h"
 
 #define MAX_LOADSTRING 100
 
@@ -17,42 +18,28 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+    SystemClass* System;
+    bool result;
 
-    // TODO: Place code here.
 
-    // Initialize global strings
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_ENGINE, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+    // Create the system object.
+    System = new SystemClass;
 
-    // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
+    // Initialize and run the system object.
+    result = System->Initialize();
+    if (result)
     {
-        return FALSE;
+        System->Run();
     }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_ENGINE));
+    // Shutdown and release the system object.
+    System->Shutdown();
+    delete System;
+    System = 0;
 
-    MSG msg;
-
-    // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
-
-    return (int) msg.wParam;
+    return 0;
 }
 
 
